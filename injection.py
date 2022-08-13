@@ -17,10 +17,8 @@ def main():
   for dir in ign_directories:
     path = dir['path']
     mode = int(dir['mode'])
-    if not os.path.exists(path):
-      os.makedirs(path, mode)
-    else:
-      os.chmod(path, mode)
+    if not os.path.exists(path): os.makedirs(path, mode)
+    os.chmod(path, mode)
 
   for file in ign_files:
     path = file['path']
@@ -28,10 +26,6 @@ def main():
     dict_contents = file.get('contents', {})
     content_compression = dict_contents.get('compression', '')
     content_source = dict_contents.get('source', '')
-
-    print(f'{path}:')
-    print(f'compression: {content_compression}')
-    # print(f'source: {content_source}')
 
     if content_compression == "gzip":
       base64encoded_string = content_source.replace('data:;base64,', '')
