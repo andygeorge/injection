@@ -1,6 +1,6 @@
 # Injection
 
-Injection is a simple Python3 utility that consumes and processes [Ignition](https://coreos.github.io/ignition/) configs and writes out directories, files, and systemd units on an **already-running host**, differing from Ignition, which is only intended to configure a host on first boot.
+Injection is a simple Python3 utility that consumes and processes [Ignition](https://coreos.github.io/ignition/) configs and writes out directories, files, and systemd units on an **already-running host**, differing from Ignition, which is only intended to configure immutable hosts on first boot.
 
 This can be used in conjunction with [Butane](https://coreos.github.io/butane/) to create simple, human-readable configuration files.
 
