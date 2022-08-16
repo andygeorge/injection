@@ -28,6 +28,7 @@ def main():
   for dir in ign_directories:
     path = dir['path']
     mode = int(dir['mode'])
+    print(f'Creating directory: {path}')
     if not exists(path): makedirs(path, mode)
     chmod(path, mode)
 
@@ -44,12 +45,11 @@ def main():
       decompressed_bytestring = decompress(gzipped_string)
       raw_string = str(decompressed_bytestring)[2:-1]
       the_content = raw_string.replace('\\n', '\n').replace('\\\\', '\\')
-
-      with open(path, 'w') as fh: fh.write(the_content)
     else:
       quoted_string = content_source.replace('data:,', '')
       the_content = unquote(quoted_string)
-      with open(path, 'w') as fh: fh.write(the_content)
+    print(f'Creating file: {path}')
+    with open(path, 'w') as fh: fh.write(the_content)
 
   for unit in ign_units:
     name = unit['name']
@@ -57,8 +57,10 @@ def main():
     enabled = bool(unit['enabled'])
     content = unit['contents']
 
+    print(f'Creating file: {path}')
     with open(path, 'w') as fh: fh.write(content)
     if enabled:
+      print(f'Enabling/starting service: {name}')
       system(f'systemctl enable {name}')
       system('systemctl daemon-reload')
       system(f'systemctl start {name}')
