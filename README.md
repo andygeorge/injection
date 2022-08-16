@@ -1,6 +1,6 @@
 # Injection
 
-Injection is a simple Python3 utility that consumes and processes [Ignition](https://coreos.github.io/ignition/) configs and writes out directories, files, and systemd units (and optionally enables/starts them!) on an **already-running host**, differing from Ignition, which is only intended to configure immutable hosts on first boot.
+Injection is a simple Python3 utility that consumes and processes [Ignition](https://coreos.github.io/ignition/) configs and writes out directories, files, and systemd units (and optionally enables/starts them!) on an **already-running Linux host**, differing from Ignition, which is only intended to configure immutable Fedora/RedHat CoreOS hosts on first boot.
 
 In conjunction with [Butane](https://coreos.github.io/butane/), this allows you to build human-readable configuration files that can be used to easily (re)configure existing hosts.
 
@@ -10,23 +10,14 @@ In conjunction with [Butane](https://coreos.github.io/butane/), this allows you 
 - [Butane](https://coreos.github.io/butane/getting-started/#getting-butane), if you're planning on using Butane to generate Ignition configs (recommended)
 
 ## Installation
-- Download `injection` (either [a release](https://github.com/andygeorge/injection/releases) or by cloning this repo)
-- Place `injection` somewhere in your `$PATH`
-
-Or, use this one-liner:
 
 ```
 sudo wget https://github.com/andygeorge/injection/releases/download/v1.0.1/injection -O /usr/local/bin/injection
 ```
 
-## Usage
-
-```
-$ injection
-usage: injection [-h] path
-
-$ injection path/to/your/ignition.ign
-```
+Or, manually:
+- Download the `injection` script (either [a release](https://github.com/andygeorge/injection/releases) or by cloning this repo)
+- Place `injection` somewhere in your `$PATH`
 
 ## Example
 
