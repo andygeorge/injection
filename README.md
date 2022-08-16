@@ -13,6 +13,12 @@ In conjunction with [Butane](https://coreos.github.io/butane/), this allows you 
 - Download `injection` (either [a release](https://github.com/andygeorge/injection/releases) or by cloning this repo)
 - Place `injection` somewhere in your `$PATH`
 
+Or, use this one-liner:
+
+```
+sudo wget https://github.com/andygeorge/injection/releases/download/v1.0.1/injection -O /usr/local/bin/injection
+```
+
 ## Usage
 
 ```
