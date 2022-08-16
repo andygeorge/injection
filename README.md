@@ -24,7 +24,7 @@ $ injection path/to/your/ignition.ign
 
 ## Example
 
-- Create a Butane config file, `example.bu`:
+- Create a Butane config file, `hello_world.bu`:
 
 ```yaml
 variant: fcos
@@ -46,15 +46,15 @@ storage:
 - Create an Ignition config using Butane:
 
 ```bash
-$ butane --strict example.bu > example.ign
-$ cat example.ign
+$ butane --strict hello_world.bu > hello_world.ign
+$ cat hello_world.ign
 {"ignition":{"version":"3.3.0"},"storage":{"directories":[{"path":"/tmp/example","mode":493}],"files":[{"path":"/tmp/example/hello_world.txt","contents":{"compression":"","source":"data:,Hello%2C%20world!%0A"},"mode":493}]}}
 ```
 
 - Run Injection:
 
 ```bash
-$ sudo injection example.ign
+$ sudo injection hello_world.ign
 Creating directory: /tmp/example
 Creating file: /tmp/example/hello_world.txt
 
