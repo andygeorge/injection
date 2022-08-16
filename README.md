@@ -7,7 +7,7 @@ This can be used in conjunction with [Butane](https://coreos.github.io/butane/) 
 ## Prerequisites
 
 - Python 3
-- Butane, if you're planning on using Butane config files
+- [Butane](https://coreos.github.io/butane/getting-started/#getting-butane), if you're planning on using Butane to generate Ignition configs (recommended)
 
 ## Installation
 - Download `injection` (either [a release](https://github.com/andygeorge/injection/releases) or by cloning this repo)
