@@ -57,4 +57,7 @@ $ cat example.ign
 $ sudo injection example.ign
 Creating directory: /tmp/example
 Creating file: /tmp/example/hello_world.txt
+
+$ cat /tmp/example/hello_world.txt
+Hello, world!
 ```
