@@ -2,7 +2,7 @@
 
 Injection is a simple Python3 utility that consumes and processes [Ignition](https://coreos.github.io/ignition/) configs and writes out directories, files, and systemd units on an **already-running host**, differing from Ignition, which is only intended to configure a host on first boot.
 
-This can be used in conjunction with [Butane](https://github.com/coreos/butane) to create simple, human-readable configuration files.
+This can be used in conjunction with [Butane](https://coreos.github.io/butane/) to create simple, human-readable configuration files.
 
 ## Prerequisites
 
@@ -61,3 +61,13 @@ Creating file: /tmp/example/hello_world.txt
 $ cat /tmp/example/hello_world.txt
 Hello, world!
 ```
+
+## Ignition support
+
+This only has basic Ignition support for a few specific fields:
+
+- `storage:files`
+- `storage:directories`
+- `systemd:units`
+
+Support for `passwd:users` is [planned](https://github.com/andygeorge/injection/issues/1).
