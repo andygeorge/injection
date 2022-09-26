@@ -16,7 +16,7 @@ const (
 
 type IgnitionConfig struct {
 	Storage struct {
-		DirectoriesList []struct {
+		Directories []struct {
 			Path string `json:"path"`
 			Mode int    `json:"mode"`
 		} `json:"directories"`
@@ -66,13 +66,32 @@ func main() {
 	err = json.Unmarshal([]byte(string(readFile)), &ignitionConfig)
 	check(err)
 
+	for _, directoryConfig := range ignitionConfig.Storage.Directories {
+		path := directoryConfig.Path
+		fmt.Println(path)
+
+		mode := DefaultDirectoryMode
+		if directoryConfig.Mode != 0 {
+			mode = os.FileMode(directoryConfig.Mode)
+		}
+
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			err = os.MkdirAll(path, mode)
+		} else {
+			err = os.Chmod(path, mode)
+		}
+		check(err)
+	}
+
 	for _, fileConfig := range ignitionConfig.Storage.Files {
 		fmt.Println(fileConfig.Path)
 
-		fileMode := os.FileMode(fileConfig.Mode)
+		mode := DefaultFileMode
+		if fileConfig.Mode != 0 {
+			mode = os.FileMode(fileConfig.Mode)
+		}
 
-		// write file
-		targetFile, err := os.OpenFile(fileConfig.Path, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, fileMode)
+		targetFile, err := os.OpenFile(fileConfig.Path, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, mode)
 		check(err)
 		fmt.Fprintf(targetFile, "%s", fileConfig.Contents.Source)
 		targetFile.Close()
@@ -87,12 +106,10 @@ func main() {
 			unitEnabledString = "enable"
 		}
 
-		// write systemd unit file
 		targetFile, err := os.OpenFile(filePath, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, DefaultSystemdUnitFileMode)
 		check(err)
 		fmt.Fprintf(targetFile, "%s", unitConfig.Contents)
 
-		// enable/disable unit
 		cmd := exec.Command("systemctl", unitEnabledString, unitConfig.Name)
 		err = cmd.Run()
 		check(err)
