@@ -1,0 +1,47 @@
+variant: fcos
+version: 1.4.0
+
+storage:
+  directories:
+    - path: /tmp/example
+      mode: 0755
+
+    - path: /tmp/example2
+
+    - path: /tmp/example3/example4
+      mode: 0744
+
+  files:
+    - path: /tmp/example/hello_world.txt
+      contents:
+        inline: |
+          Hello, world!
+
+    - path: /tmp/example/hello_world_gzip.txt
+      mode: 0644
+      contents:
+        inline: |
+          This is a much larger Hello World file that will use gzip compression
+          in the Ignition. Lorem ipsum dolor sit amet, consectetur adipisicing
+          elit, sed do eiusmod tempor incididunt ut labore et dolore magna
+          aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+          laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
+          in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+          culpa qui officia deserunt mollit anim id est laborum.
+
+systemd:
+  units:
+    - name: hello-world.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Hello world service
+
+        [Service]
+        Type=oneshot
+        ExecStart=/usr/bin/echo "hello world"
+        StandardOutput=journal
+
+        [Install]
+        WantedBy=multi-user.target default.target
