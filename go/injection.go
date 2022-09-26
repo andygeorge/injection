@@ -11,7 +11,7 @@ const (
 	DefaultDirectoryMode       os.FileMode = 0755
 	DefaultFileMode            os.FileMode = 0644
 	DefaultSystemdUnitFileMode os.FileMode = 0644
-	SystemdUnitPath            string      = "/etc/systemd/system"
+	DefaultSystemdUnitPath     string      = "/etc/systemd/system"
 )
 
 type IgnitionConfig struct {
@@ -98,7 +98,7 @@ func main() {
 	}
 
 	for _, unitConfig := range ignitionConfig.Systemd.Units {
-		filePath := SystemdUnitPath + "/" + unitConfig.Name
+		filePath := DefaultSystemdUnitPath + "/" + unitConfig.Name
 		fmt.Println(filePath)
 
 		unitEnabledString := "disable"
