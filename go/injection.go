@@ -84,29 +84,30 @@ func main() {
 	}
 
 	for _, fileConfig := range ignitionConfig.Storage.Files {
-		fmt.Println(fileConfig.Path)
+		path := fileConfig.Path
+		fmt.Println(path)
 
 		mode := DefaultFileMode
 		if fileConfig.Mode != 0 {
 			mode = os.FileMode(fileConfig.Mode)
 		}
 
-		targetFile, err := os.OpenFile(fileConfig.Path, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, mode)
+		targetFile, err := os.OpenFile(path, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, mode)
 		check(err)
 		fmt.Fprintf(targetFile, "%s", fileConfig.Contents.Source)
 		targetFile.Close()
 	}
 
 	for _, unitConfig := range ignitionConfig.Systemd.Units {
-		filePath := DefaultSystemdUnitPath + "/" + unitConfig.Name
-		fmt.Println(filePath)
+		path := DefaultSystemdUnitPath + "/" + unitConfig.Name
+		fmt.Println(path)
 
 		unitEnabledString := "disable"
 		if unitConfig.Enabled {
 			unitEnabledString = "enable"
 		}
 
-		targetFile, err := os.OpenFile(filePath, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, DefaultSystemdUnitFileMode)
+		targetFile, err := os.OpenFile(path, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, DefaultSystemdUnitFileMode)
 		check(err)
 		fmt.Fprintf(targetFile, "%s", unitConfig.Contents)
 
