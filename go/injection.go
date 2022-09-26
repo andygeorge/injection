@@ -4,6 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"os/exec"
+)
+
+const (
+	DefaultDirectoryMode       os.FileMode = 0755
+	DefaultFileMode            os.FileMode = 0644
+	DefaultSystemdUnitFileMode os.FileMode = 0644
+	SystemdUnitPath            string      = "/etc/systemd/system"
 )
 
 type IgnitionConfig struct {
@@ -12,7 +20,7 @@ type IgnitionConfig struct {
 			Path string `json:"path"`
 			Mode int    `json:"mode"`
 		} `json:"directories"`
-		FilesList []struct {
+		Files []struct {
 			Path     string `json:"path"`
 			Mode     int    `json:"mode"`
 			Contents struct {
@@ -22,7 +30,7 @@ type IgnitionConfig struct {
 		} `json:"files"`
 	} `json:"storage"`
 	Systemd struct {
-		UnitsList []struct {
+		Units []struct {
 			Name     string `json:"name"`
 			Enabled  bool   `json:"enabled"`
 			Contents string `json:"contents"`
@@ -52,11 +60,41 @@ func main() {
 		filename = args[0]
 	}
 
-	read_file, err := os.ReadFile(filename)
+	readFile, err := os.ReadFile(filename)
 	check(err)
 
-	err = json.Unmarshal([]byte(string(read_file)), &ignitionConfig)
+	err = json.Unmarshal([]byte(string(readFile)), &ignitionConfig)
 	check(err)
 
-	fmt.Printf("ignitionConfig: %v", ignitionConfig)
+	for _, fileConfig := range ignitionConfig.Storage.Files {
+		fmt.Println(fileConfig.Path)
+
+		fileMode := os.FileMode(fileConfig.Mode)
+
+		// write file
+		targetFile, err := os.OpenFile(fileConfig.Path, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, fileMode)
+		check(err)
+		fmt.Fprintf(targetFile, "%s", fileConfig.Contents.Source)
+		targetFile.Close()
+	}
+
+	for _, unitConfig := range ignitionConfig.Systemd.Units {
+		filePath := SystemdUnitPath + "/" + unitConfig.Name
+		fmt.Println(filePath)
+
+		unitEnabledString := "disable"
+		if unitConfig.Enabled {
+			unitEnabledString = "enable"
+		}
+
+		// write systemd unit file
+		targetFile, err := os.OpenFile(filePath, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, DefaultSystemdUnitFileMode)
+		check(err)
+		fmt.Fprintf(targetFile, "%s", unitConfig.Contents)
+
+		// enable/disable unit
+		cmd := exec.Command("systemctl", unitEnabledString, unitConfig.Name)
+		err = cmd.Run()
+		check(err)
+	}
 }
