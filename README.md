@@ -55,6 +55,16 @@ butane --strict example_files/example.bu > example_files/example.ign
 sudo injection example_files/example.ign
 ```
 
+This will write out the directories, files, and systemd units defined in the example:
+```shell
+/tmp/example
+/tmp/example2
+/tmp/example3/example4
+/tmp/example/hello_world.txt
+/tmp/example/hello_world_gzip.txt
+/etc/systemd/system/hello-world.service
+```
+
 ## Ignition support
 
 This only has basic Ignition support for a few specific fields:
