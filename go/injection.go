@@ -38,15 +38,7 @@ type IgnitionConfig struct {
 	} `json:"systemd"`
 }
 
-func check(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-
 func main() {
-	fmt.Println()
-
 	var filename string
 	var ignitionConfig IgnitionConfig
 	var err error
@@ -66,40 +58,72 @@ func main() {
 	err = json.Unmarshal([]byte(string(readFile)), &ignitionConfig)
 	check(err)
 
+	err = WriteDirectories(ignitionConfig)
+	check(err)
+
+	err = WriteFiles(ignitionConfig)
+	check(err)
+
+	err = WriteUnits(ignitionConfig)
+	check(err)
+}
+
+func OpenFile(path string, mode os.FileMode) (*os.File, error) {
+	options := os.O_WRONLY | os.O_TRUNC | os.O_CREATE
+
+	return os.OpenFile(path, options, mode)
+}
+
+func WriteDirectories(ignitionConfig IgnitionConfig) error {
+	var err error
+
 	for _, directoryConfig := range ignitionConfig.Storage.Directories {
 		path := directoryConfig.Path
+		mode := DefaultDirectoryMode
 		fmt.Println(path)
 
-		mode := DefaultDirectoryMode
 		if directoryConfig.Mode != 0 {
 			mode = os.FileMode(directoryConfig.Mode)
 		}
 
-		if _, err := os.Stat(path); os.IsNotExist(err) {
+		if _, err = os.Stat(path); os.IsNotExist(err) {
 			err = os.MkdirAll(path, mode)
 		} else {
 			err = os.Chmod(path, mode)
 		}
-		check(err)
 	}
+
+	return err
+}
+
+func WriteFiles(ignitionConfig IgnitionConfig) error {
+	var err error
+	var targetFile *os.File
 
 	for _, fileConfig := range ignitionConfig.Storage.Files {
 		path := fileConfig.Path
+		mode := DefaultFileMode
 		fmt.Println(path)
 
-		mode := DefaultFileMode
 		if fileConfig.Mode != 0 {
 			mode = os.FileMode(fileConfig.Mode)
 		}
 
-		targetFile, err := os.OpenFile(path, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, mode)
-		check(err)
+		targetFile, err = OpenFile(path, mode)
 		fmt.Fprintf(targetFile, "%s", fileConfig.Contents.Source)
-		targetFile.Close()
+		defer targetFile.Close()
 	}
+
+	return err
+}
+
+func WriteUnits(ignitionConfig IgnitionConfig) error {
+	var err error
+	var targetFile *os.File
 
 	for _, unitConfig := range ignitionConfig.Systemd.Units {
 		path := DefaultSystemdUnitPath + "/" + unitConfig.Name
+		mode := DefaultSystemdUnitFileMode
 		fmt.Println(path)
 
 		unitEnabledString := "disable"
@@ -107,12 +131,21 @@ func main() {
 			unitEnabledString = "enable"
 		}
 
-		targetFile, err := os.OpenFile(path, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, DefaultSystemdUnitFileMode)
-		check(err)
+		targetFile, err = OpenFile(path, mode)
 		fmt.Fprintf(targetFile, "%s", unitConfig.Contents)
+		defer targetFile.Close()
+		check(err)
 
 		cmd := exec.Command("systemctl", unitEnabledString, unitConfig.Name)
 		err = cmd.Run()
 		check(err)
+	}
+
+	return err
+}
+
+func check(err error) {
+	if err != nil {
+		panic(err)
 	}
 }
