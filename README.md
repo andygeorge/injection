@@ -11,12 +11,18 @@ In conjunction with [Butane](https://coreos.github.io/butane/), this allows you 
 
 ## Installation
 
-```
-sudo wget https://github.com/andygeorge/injection/releases/download/v1.0.1/injection -O /usr/local/bin/injection
+
+```shell
+INJECTION_VERSION=v0.1.0-beta
+BIN_FOLDER=/usr/local/bin
+GOARCH=amd64
+GOOS=linux
+sudo wget https://github.com/andygeorge/injection/releases/download/$INJECTION_VERSION/injection-$GOARCH-$GOOS -O $BIN_FOLDER/injection
+sudo chmod a+x $BIN_FOLDER/injection
 ```
 
 Or, manually:
-- Download the `injection` script (either [a release](https://github.com/andygeorge/injection/releases) or by cloning this repo)
+- Download an [`injection` binary release](https://github.com/andygeorge/injection/releases)
 - Place `injection` somewhere in your `$PATH`
 
 ## Example
@@ -46,7 +52,7 @@ butane --strict example_files/example.bu > example_files/example.ign
 
 - Run Injection:
 ```shell
-# TODO: injection example
+sudo injection example_files/example.ign
 ```
 
 ## Ignition support
