@@ -21,6 +21,12 @@ Or, manually:
 
 ## Example
 
+- Clone and enter this repo
+```shell
+gh repo clone andygeorge/injection
+cd injection
+```
+
 - Use the example Butane config file:
 ```shell
 cp example_butane.bu example_files/example.bu
