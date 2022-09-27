@@ -21,42 +21,26 @@ Or, manually:
 
 ## Example
 
-- Create a Butane config file, `hello_world.bu`:
-
-```yaml
-variant: fcos
-version: 1.4.0
-
-storage:
-  directories:
-    - path: /tmp/example
-      mode: 0755
-
-  files:
-    - path: /tmp/example/hello_world.txt
-      mode: 0755
-      contents:
-        inline: |
-          Hello, world!
+- Use the example Butane config file:
+```shell
+cp example_butane.bu example_files/example.bu
 ```
 
-- Create an Ignition config using Butane:
+- The file `example_files/example.bu` should be populated
 
-```bash
-$ butane --strict hello_world.bu > hello_world.ign
-$ cat hello_world.ign
-{"ignition":{"version":"3.3.0"},"storage":{"directories":[{"path":"/tmp/example","mode":493}],"files":[{"path":"/tmp/example/hello_world.txt","contents":{"compression":"","source":"data:,Hello%2C%20world!%0A"},"mode":493}]}}
+- Create an Ignition config using Butane:
+```shell
+butane --strict example_files/example.bu > example_files/example.ign
+```
+
+- The file `example_files/example.ign` should be populated and look like this:
+```json
+{"ignition":{"version":"3.3.0"},"storage":{"directories":[{"path":"/tmp/example","mode":493}],"files":[{"path":"/tmp/example/hello_world.txt","contents":{"compression":"","source":"data:,Hello%2C%20world!%0A"},"mode":420},{"path":"/tmp/example/hello_world_gzip.txt","contents":{"compression":"gzip","source":"data:;base64,H4sIAAAAAAAC/zSQQc4UOwyE9+8UdYBRn+IhgcQSxNoknu6Skjjj2MOI06MwP7soicv1fd8uLnBB0LNcaOKnOj5ra4Yf5q3izqaISwK/2BpyKc7fnCjWp+tatAEOxKX4cg4GbRz4aq4dnCs7qjVzLAaka9xQbCwtoZEOqZxcLBwntDFuWFpRDcpc3SpC+zQHR2FlzRHIQJOf5gqNd7aiyzkE0vhIOfA9oIMdUtG5D08dlH7DI7kwbIVnhb7UC0N2YWRr0ou9k/cnLu5NfyM5oS+obORu1d4Ej5Q48P+OlAwFPV0/YDngOl0vHVWdsS+e1nKGhOK5SaFrKQpb+6dIoYl7npTA2IUwxSmRfuDTq+gMze1xBKwU0SKBkpNVYk/YwHRj1bEtblMcKNmmbG7Y/c5CQdWlvl+7tV1DtiBW6Prwmv34708AAAD//9sohz4WAgAA"},"mode":420}]},"systemd":{"units":[{"contents":"[Unit]\nDescription=Hello world service\n\n[Service]\nType=oneshot\nExecStart=/usr/bin/echo \"hello world\"\nStandardOutput=journal\n\n[Install]\nWantedBy=multi-user.target default.target\n","enabled":true,"name":"hello-world.service"}]}}
 ```
 
 - Run Injection:
-
-```bash
-$ sudo injection hello_world.ign
-Creating directory: /tmp/example
-Creating file: /tmp/example/hello_world.txt
-
-$ cat /tmp/example/hello_world.txt
-Hello, world!
+```shell
+# TODO: injection example
 ```
 
 ## Ignition support
