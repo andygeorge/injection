@@ -143,6 +143,7 @@ func WriteFiles(ignitionConfig IgnitionConfig) error {
 			fmt.Fprintf(targetFile, "%s", unescapedData)
 		}
 	}
+
 	return err
 }
 
