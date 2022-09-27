@@ -1,10 +1,15 @@
 package main
 
 import (
+	"compress/gzip"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/url"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 const (
@@ -103,17 +108,41 @@ func WriteFiles(ignitionConfig IgnitionConfig) error {
 	for _, fileConfig := range ignitionConfig.Storage.Files {
 		path := fileConfig.Path
 		mode := DefaultFileMode
+		compression := fileConfig.Contents.Compression
+		source := fileConfig.Contents.Source
+		var rawData, unescapedData string
+		var decodedGzipData []byte
 		fmt.Println(path)
 
 		if fileConfig.Mode != 0 {
 			mode = os.FileMode(fileConfig.Mode)
 		}
 
-		targetFile, err = OpenFile(path, mode)
-		fmt.Fprintf(targetFile, "%s", fileConfig.Contents.Source)
-		defer targetFile.Close()
-	}
+		if compression == "gzip" {
+			idx := strings.Index(source, ";base64,")
+			rawData = source[idx+8:]
 
+			gz, err := decodeBase64Data(rawData)
+			decodedGzipData, err = decodeGzipData(string(gz))
+			targetFile, err = OpenFile(path, mode)
+			if err != nil {
+				return err
+			}
+			defer targetFile.Close()
+			fmt.Fprintf(targetFile, "%s", string(decodedGzipData))
+		} else {
+			idx := strings.Index(source, ",")
+			rawData = source[idx+1:]
+
+			targetFile, err = OpenFile(path, mode)
+			if err != nil {
+				return err
+			}
+			defer targetFile.Close()
+			unescapedData, err = url.QueryUnescape(rawData)
+			fmt.Fprintf(targetFile, "%s", unescapedData)
+		}
+	}
 	return err
 }
 
@@ -142,6 +171,25 @@ func WriteUnits(ignitionConfig IgnitionConfig) error {
 	}
 
 	return err
+}
+
+func decodeBase64Data(data string) ([]byte, error) {
+	decodedData, err := base64.StdEncoding.DecodeString(data)
+	if err != nil {
+		return nil, fmt.Errorf("unable to decode base64: %q", err)
+	}
+
+	return decodedData, nil
+}
+
+func decodeGzipData(data string) ([]byte, error) {
+	reader, err := gzip.NewReader(strings.NewReader(data))
+	if err != nil {
+		return nil, err
+	}
+	defer reader.Close()
+
+	return io.ReadAll(reader)
 }
 
 func check(err error) {
