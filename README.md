@@ -1,12 +1,12 @@
 # Injection
 
-Injection is a simple Python3 utility that consumes and processes [Ignition](https://coreos.github.io/ignition/) configs and writes out directories, files, and systemd units (and optionally enables/starts them!) on an **already-running Linux host**, differing from Ignition, which is only intended to configure immutable Fedora/RedHat CoreOS hosts on first boot.
+Injection is a simple utility that consumes and processes [Ignition](https://coreos.github.io/ignition/) configs and writes out directories, files, and systemd units (and enables/disables them!) on an **already-running Linux host**, differing from Ignition, which is only intended to configure immutable Fedora/RedHat CoreOS hosts on first boot.
 
 In conjunction with [Butane](https://coreos.github.io/butane/), this allows you to build human-readable configuration files that can be used to easily (re)configure existing hosts.
 
 ## Prerequisites
 
-- Python 3
+- Linux/macOS
 - [Butane](https://coreos.github.io/butane/getting-started/#getting-butane), if you're planning on using Butane to generate Ignition configs (recommended)
 
 ## Installation
@@ -52,3 +52,19 @@ This only has basic Ignition support for a few specific fields:
 - `systemd:units`
 
 Support for `passwd:users` is [planned](https://github.com/andygeorge/injection/issues/1).
+
+
+----
+# injection-go
+`injection` built in Go.
+
+```shell
+# generate ignition
+butane --strict ../example_files/example.bu > ../example_files/example.ign
+
+# build injection
+go mod tidy && go fmt *.go && go build -o build/
+
+# run injection
+./build/injection ../example_files/example.ign
+```
