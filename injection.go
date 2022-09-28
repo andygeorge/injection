@@ -123,7 +123,13 @@ func WriteFiles(ignitionConfig IgnitionConfig) error {
 			rawData = source[idx+8:]
 
 			gz, err := decodeBase64Data(rawData)
+      if err != nil {
+				return err
+			}
 			decodedGzipData, err = decodeGzipData(string(gz))
+      if err != nil {
+				return err
+			}
 			targetFile, err = OpenFile(path, mode)
 			if err != nil {
 				return err
@@ -140,6 +146,9 @@ func WriteFiles(ignitionConfig IgnitionConfig) error {
 			}
 			defer targetFile.Close()
 			unescapedData, err = url.QueryUnescape(rawData)
+      if err != nil {
+				return err
+			}
 			fmt.Fprintf(targetFile, "%s", unescapedData)
 		}
 	}
@@ -162,13 +171,17 @@ func WriteUnits(ignitionConfig IgnitionConfig) error {
 		}
 
 		targetFile, err = OpenFile(path, mode)
+    if err != nil {
+      return err
+    }
 		fmt.Fprintf(targetFile, "%s", unitConfig.Contents)
 		defer targetFile.Close()
-		check(err)
 
 		cmd := exec.Command("systemctl", unitEnabledString, unitConfig.Name)
 		err = cmd.Run()
-		check(err)
+    if err != nil {
+      return err
+    }
 	}
 
 	return err
