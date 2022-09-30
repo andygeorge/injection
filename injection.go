@@ -58,19 +58,19 @@ func main() {
 	}
 
 	readFile, err := os.ReadFile(filename)
-	check(err)
+	handleError(err, "Error reading file")
 
 	err = json.Unmarshal([]byte(string(readFile)), &ignitionConfig)
-	check(err)
+	handleError(err, "Error unmarshaling json")
 
 	err = WriteDirectories(ignitionConfig)
-	check(err)
+	handleError(err, "Error in WriteDirectories")
 
 	err = WriteFiles(ignitionConfig)
-	check(err)
+	handleError(err, "Error in WriteFiles")
 
 	err = WriteUnits(ignitionConfig)
-	check(err)
+	handleError(err, "Error in WriteUnits")
 }
 
 func OpenFile(path string, mode os.FileMode) (*os.File, error) {
@@ -123,7 +123,13 @@ func WriteFiles(ignitionConfig IgnitionConfig) error {
 			rawData = source[idx+8:]
 
 			gz, err := decodeBase64Data(rawData)
+			if err != nil {
+				return err
+			}
 			decodedGzipData, err = decodeGzipData(string(gz))
+			if err != nil {
+				return err
+			}
 			targetFile, err = OpenFile(path, mode)
 			if err != nil {
 				return err
@@ -140,6 +146,9 @@ func WriteFiles(ignitionConfig IgnitionConfig) error {
 			}
 			defer targetFile.Close()
 			unescapedData, err = url.QueryUnescape(rawData)
+			if err != nil {
+				return err
+			}
 			fmt.Fprintf(targetFile, "%s", unescapedData)
 		}
 	}
@@ -162,13 +171,21 @@ func WriteUnits(ignitionConfig IgnitionConfig) error {
 		}
 
 		targetFile, err = OpenFile(path, mode)
+		if err != nil {
+			handleError(err, "Error opening file")
+			err = nil
+			continue
+		}
 		fmt.Fprintf(targetFile, "%s", unitConfig.Contents)
 		defer targetFile.Close()
-		check(err)
 
 		cmd := exec.Command("systemctl", unitEnabledString, unitConfig.Name)
 		err = cmd.Run()
-		check(err)
+		if err != nil {
+			handleError(err, "Error running systemctl")
+			err = nil
+			continue
+		}
 	}
 
 	return err
@@ -193,8 +210,11 @@ func decodeGzipData(data string) ([]byte, error) {
 	return io.ReadAll(reader)
 }
 
-func check(err error) {
+func handleError(err error, message string) {
 	if err != nil {
-		panic(err)
+		if message != "" {
+			fmt.Printf("%s", message)
+		}
+		fmt.Printf(": %q\n", err)
 	}
 }
