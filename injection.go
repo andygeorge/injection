@@ -58,19 +58,19 @@ func main() {
 	}
 
 	readFile, err := os.ReadFile(filename)
-	check(err)
+	handleError(err)
 
 	err = json.Unmarshal([]byte(string(readFile)), &ignitionConfig)
-	check(err)
+	handleError(err)
 
 	err = WriteDirectories(ignitionConfig)
-	check(err)
+	handleError(err)
 
 	err = WriteFiles(ignitionConfig)
-	check(err)
+	handleError(err)
 
 	err = WriteUnits(ignitionConfig)
-	check(err)
+	handleError(err)
 }
 
 func OpenFile(path string, mode os.FileMode) (*os.File, error) {
@@ -123,11 +123,11 @@ func WriteFiles(ignitionConfig IgnitionConfig) error {
 			rawData = source[idx+8:]
 
 			gz, err := decodeBase64Data(rawData)
-      if err != nil {
+			if err != nil {
 				return err
 			}
 			decodedGzipData, err = decodeGzipData(string(gz))
-      if err != nil {
+			if err != nil {
 				return err
 			}
 			targetFile, err = OpenFile(path, mode)
@@ -146,7 +146,7 @@ func WriteFiles(ignitionConfig IgnitionConfig) error {
 			}
 			defer targetFile.Close()
 			unescapedData, err = url.QueryUnescape(rawData)
-      if err != nil {
+			if err != nil {
 				return err
 			}
 			fmt.Fprintf(targetFile, "%s", unescapedData)
@@ -171,17 +171,17 @@ func WriteUnits(ignitionConfig IgnitionConfig) error {
 		}
 
 		targetFile, err = OpenFile(path, mode)
-    if err != nil {
-      return err
-    }
+		if err != nil {
+			return err
+		}
 		fmt.Fprintf(targetFile, "%s", unitConfig.Contents)
 		defer targetFile.Close()
 
 		cmd := exec.Command("systemctl", unitEnabledString, unitConfig.Name)
 		err = cmd.Run()
-    if err != nil {
-      return err
-    }
+		if err != nil {
+			return err
+		}
 	}
 
 	return err
@@ -206,7 +206,7 @@ func decodeGzipData(data string) ([]byte, error) {
 	return io.ReadAll(reader)
 }
 
-func check(err error) {
+func handleError(err error) {
 	if err != nil {
 		panic(err)
 	}
