@@ -58,19 +58,19 @@ func main() {
 	}
 
 	readFile, err := os.ReadFile(filename)
-	handleError(err)
+	handleError(err, "Error reading file")
 
 	err = json.Unmarshal([]byte(string(readFile)), &ignitionConfig)
-	handleError(err)
+	handleError(err, "Error unmarshaling json")
 
 	err = WriteDirectories(ignitionConfig)
-	handleError(err)
+	handleError(err, "Error in WriteDirectories")
 
 	err = WriteFiles(ignitionConfig)
-	handleError(err)
+	handleError(err, "Error in WriteFiles")
 
 	err = WriteUnits(ignitionConfig)
-	handleError(err)
+	handleError(err, "Error in WriteUnits")
 }
 
 func OpenFile(path string, mode os.FileMode) (*os.File, error) {
@@ -172,7 +172,9 @@ func WriteUnits(ignitionConfig IgnitionConfig) error {
 
 		targetFile, err = OpenFile(path, mode)
 		if err != nil {
-			return err
+			handleError(err, "Error opening file")
+			err = nil
+			continue
 		}
 		fmt.Fprintf(targetFile, "%s", unitConfig.Contents)
 		defer targetFile.Close()
@@ -180,7 +182,9 @@ func WriteUnits(ignitionConfig IgnitionConfig) error {
 		cmd := exec.Command("systemctl", unitEnabledString, unitConfig.Name)
 		err = cmd.Run()
 		if err != nil {
-			return err
+			handleError(err, "Error running systemctl")
+			err = nil
+			continue
 		}
 	}
 
@@ -206,8 +210,11 @@ func decodeGzipData(data string) ([]byte, error) {
 	return io.ReadAll(reader)
 }
 
-func handleError(err error) {
+func handleError(err error, message string) {
 	if err != nil {
-		panic(err)
+		if message != "" {
+			fmt.Printf("%s", message)
+		}
+		fmt.Printf(": %q\n", err)
 	}
 }
