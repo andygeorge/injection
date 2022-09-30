@@ -11,14 +11,8 @@ In conjunction with [Butane](https://coreos.github.io/butane/), this allows you 
 
 ## Installation
 
-
 ```shell
-INJECTION_VERSION=v0.1.0-beta
-BIN_FOLDER=/usr/local/bin
-GOARCH=amd64
-GOOS=linux
-sudo wget https://github.com/andygeorge/injection/releases/download/$INJECTION_VERSION/injection-$GOARCH-$GOOS -O $BIN_FOLDER/injection
-sudo chmod a+x $BIN_FOLDER/injection
+sudo wget https://github.com/andygeorge/injection/releases/download/v0.1.1-beta/injection-amd64-linux -O /usr/local/bin/injection && sudo chmod a+x /usr/local/bin/injection
 ```
 
 Or, manually:
