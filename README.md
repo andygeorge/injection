@@ -35,7 +35,7 @@ cd injection
 
 - Use the example Butane config file:
 ```shell
-cp example_butane.bu example_files/example.bu
+mkdir example_files && cp example_butane.bu example_files/example.bu
 ```
 
 - The file `example_files/example.bu` should be populated
