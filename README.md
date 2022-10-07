@@ -11,8 +11,14 @@ In conjunction with [Butane](https://coreos.github.io/butane/), this allows you 
 
 ## Installation
 
+AMD64
 ```shell
 sudo wget https://github.com/andygeorge/injection/releases/download/v0.1.1-beta/injection-amd64-linux -O /usr/local/bin/injection && sudo chmod a+x /usr/local/bin/injection
+```
+
+ARM32 (eg Raspberry Pi)
+```shell
+sudo wget https://github.com/andygeorge/injection/releases/download/v0.1.1-beta/injection-arm32-linux -O /usr/local/bin/injection && sudo chmod a+x /usr/local/bin/injection
 ```
 
 Or, manually:
